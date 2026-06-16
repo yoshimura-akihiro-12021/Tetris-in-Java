@@ -1,4 +1,4 @@
-﻿# Tetris-in-Cpp
+﻿# Tetris-in-Java
 
-C++を使ってテトリスを作る。
+Javaを使ってテトリスを作る。
 
