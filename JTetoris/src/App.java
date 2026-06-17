@@ -13,9 +13,10 @@ public class App {
         // Jpanelを用いてゲーム画面を作成
         // ゲーム画面のサイズを設定
         GamePanel gamePanel = new GamePanel();
-        gamePanel.setSize(300, 600);
+        gamePanel.setSize(gamePanel.blockSize * 10, gamePanel.blockSize * 20); // 10x20のブロックサイズに設定
         frame.add(gamePanel);
-
+        frame.setFocusable(true);
+        gamePanel.requestFocus();
     }
 }
  
