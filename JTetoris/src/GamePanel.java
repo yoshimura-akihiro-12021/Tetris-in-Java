@@ -66,13 +66,26 @@ public class GamePanel extends javax.swing.JPanel {
                 g.drawRect(i * blockSize, j * blockSize, blockSize, blockSize); // グリッドを描画する
             }
         }
-        drawBlock(g); // ブロックを描画する
+        drowIMino(g, gridx, gridy); // ブロックを描画する
     }
 
     // ブロックを描画する
-    public void drawBlock(java.awt.Graphics g) {
-        g.setColor(java.awt.Color.RED);
-        g.fillRect(gridx * blockSize, gridy * blockSize, blockSize, blockSize); // ブロックのサイズは30x30
+    // public void drawBlock(java.awt.Graphics g) {
+    //     g.setColor(java.awt.Color.RED);
+    //     g.fillRect(gridx * blockSize, gridy * blockSize, blockSize, blockSize); // ブロックのサイズは30x30
+    // }
+
+    public void drowIMino(java.awt.Graphics g, int x, int y) {
+        IMino iMino = new IMino();
+        int[][] shape = iMino.getShape();
+        for (int i = 0; i < shape.length; i++) {
+            for (int j = 0; j < shape[i].length; j++) {
+                if (shape[i][j] == 1) {
+                    g.setColor(java.awt.Color.CYAN);
+                    g.fillRect((x + j) * blockSize, (y + i) * blockSize, blockSize, blockSize);
+                }
+            }
+        }
     }
 
 }
