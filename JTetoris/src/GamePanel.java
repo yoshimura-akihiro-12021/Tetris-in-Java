@@ -1,8 +1,13 @@
 
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
 public class GamePanel extends javax.swing.JPanel {
 
     int bx = 0; // ブロックのx座標
     int by = 0; // ブロックのy座標
+    int gridx = 0; // グリッドのサイズ
+    int gridy = 0; // グリッドのサイズ
     final int blockSize = 30; // ブロックのサイズ
 
     // タイマー（ループ）を仕込む
@@ -12,13 +17,39 @@ public class GamePanel extends javax.swing.JPanel {
     // Prosessingで言うvoid drow()箇所
     public GamePanel() {
 
+        setFocusable(true);
+
+        addKeyListener(new KeyListener() {
+            // Prosessingで言うvoid keyPressed()箇所
+            public void keyPressed(java.awt.event.KeyEvent e) {
+                int keyCode = e.getKeyCode();
+                if (keyCode == java.awt.event.KeyEvent.VK_LEFT) {
+                    gridx -= 1; // 左に移動
+                } else if (keyCode == java.awt.event.KeyEvent.VK_RIGHT) {
+                    gridx += 1; // 右に移動
+                } else if (keyCode == java.awt.event.KeyEvent.VK_DOWN) {
+                    gridy += 1; // 下に移動
+                }
+                repaint(); // 画面を再描画する
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+            }
+        });
+
         javax.swing.Timer timer = new javax.swing.Timer(1000, e -> {
             // ここにループさせたい処理を書く
-            // 今は1000ミリ秒ごとに画面を再描画
-            bx++; // ブロックのx座標を1増やす
-            by++; // ブロックのy座標を1増やす
-            System.out.println("x:" + bx + " y:" + by);
+            // 今は1000ミリ秒ごとに画面を再描画するようにしている
+            gridy++; // ブロックを下に移動させる
+            System.out.println("x:" + (gridx * blockSize) + " y:" + (gridy * blockSize));
             System.out.println(" w:" + getWidth() + " h:" + getHeight());
+            System.out.println(" gridx:" + gridx + " gridy:" + gridy);
+
             repaint(); // 画面を再描画する
         });
         timer.start();
@@ -41,20 +72,7 @@ public class GamePanel extends javax.swing.JPanel {
     // ブロックを描画する
     public void drawBlock(java.awt.Graphics g) {
         g.setColor(java.awt.Color.RED);
-        g.fillRect(bx, by, blockSize, blockSize); // ブロックのサイズは30x30
-    }
-
-    // Prosessingで言うvoid keyPressed()箇所
-    public void keyPressed(java.awt.event.KeyEvent e) {
-        int keyCode = e.getKeyCode();
-        if (keyCode == java.awt.event.KeyEvent.VK_LEFT) {
-            bx -= blockSize; // 左に移動
-        } else if (keyCode == java.awt.event.KeyEvent.VK_RIGHT) {
-            bx += blockSize; // 右に移動
-        } else if (keyCode == java.awt.event.KeyEvent.VK_DOWN) {
-            by += blockSize; // 下に移動
-        }
-        repaint(); // 画面を再描画する
+        g.fillRect(gridx * blockSize, gridy * blockSize, blockSize, blockSize); // ブロックのサイズは30x30
     }
 
 }
