@@ -4,11 +4,18 @@ import java.awt.event.KeyListener;
 
 public class GamePanel extends javax.swing.JPanel {
 
-    int bx = 0; // ブロックのx座標
-    int by = 0; // ブロックのy座標
     int gridx = 0; // グリッドのサイズ
     int gridy = 0; // グリッドのサイズ
     final int blockSize = 30; // ブロックのサイズ
+    protected boolean spacePressed;
+
+    Tetromino[] minos = { new Imino(),
+            new Omino(), new Smino(), new Zmino(), new Jmino(), new Lmino()
+    };
+
+    private int minoIndex = 0; // 現在のブロックのインデックス
+
+    private Tetromino currentMino = minos[minoIndex];
 
     // タイマー（ループ）を仕込む
     // コンストラクタの中でタイマーを作成し、ループさせる
@@ -24,17 +31,34 @@ public class GamePanel extends javax.swing.JPanel {
             public void keyPressed(java.awt.event.KeyEvent e) {
                 int keyCode = e.getKeyCode();
                 if (keyCode == java.awt.event.KeyEvent.VK_LEFT) {
-                    gridx -= 1; // 左に移動
+                    if (!checkCollision(gridx - 1, gridy)) {
+                        gridx -= 1; // 左に移動
+                    }
                 } else if (keyCode == java.awt.event.KeyEvent.VK_RIGHT) {
-                    gridx += 1; // 右に移動
+                    if (!checkCollision(gridx + 1, gridy)) {
+                        gridx += 1; // 右に移動
+                    }
                 } else if (keyCode == java.awt.event.KeyEvent.VK_DOWN) {
-                    gridy += 1; // 下に移動
+                    if (!checkCollision(gridx, gridy + 1)) {
+                        gridy += 1; // 下に移動
+                    }
+                } else if (keyCode == java.awt.event.KeyEvent.VK_SPACE) {
+                    // spaceキーが押されたときの処理
+                    spacePressed = true;
+                    minoIndex = (minoIndex + 1) % minos.length; // 次のブロックに切り替える
+                    currentMino = minos[minoIndex]; // currentMinoを更新する
+                    gridx = 0; // ブロックのx座標をリセットする
+                    gridy = 0; // ブロックのy座標をリセットする
+                    repaint(); // 画面を再描画する
                 }
                 repaint(); // 画面を再描画する
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
+                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
+                    spacePressed = false;
+                }
             }
 
             @Override
@@ -45,11 +69,15 @@ public class GamePanel extends javax.swing.JPanel {
         javax.swing.Timer timer = new javax.swing.Timer(1000, e -> {
             // ここにループさせたい処理を書く
             // 今は1000ミリ秒ごとに画面を再描画するようにしている
-            gridy++; // ブロックを下に移動させる
+            if (!checkCollision(gridx, gridy + 1)) {
+                gridy++; // ブロックを下に移動させる
+            }
             System.out.println("x:" + (gridx * blockSize) + " y:" + (gridy * blockSize));
             System.out.println(" w:" + getWidth() + " h:" + getHeight());
             System.out.println(" gridx:" + gridx + " gridy:" + gridy);
-
+            System.out.println(" blockSize:" + blockSize);
+            System.out.println(" currentMino:" + currentMino);
+            System.out.println(spacePressed);
             repaint(); // 画面を再描画する
         });
         timer.start();
@@ -66,26 +94,64 @@ public class GamePanel extends javax.swing.JPanel {
                 g.drawRect(i * blockSize, j * blockSize, blockSize, blockSize); // グリッドを描画する
             }
         }
-        drowIMino(g, gridx, gridy); // ブロックを描画する
+        drowMinos(g, gridx, gridy); // ブロックを描画する
     }
 
     // ブロックを描画する
     // public void drawBlock(java.awt.Graphics g) {
-    //     g.setColor(java.awt.Color.RED);
-    //     g.fillRect(gridx * blockSize, gridy * blockSize, blockSize, blockSize); // ブロックのサイズは30x30
+    // g.setColor(java.awt.Color.RED);
+    // g.fillRect(gridx * blockSize, gridy * blockSize, blockSize, blockSize); //
+    // ブロックのサイズは30x30
     // }
 
-    public void drowIMino(java.awt.Graphics g, int x, int y) {
-        IMino iMino = new IMino();
-        int[][] shape = iMino.getShape();
+    // public void drowIMino(java.awt.Graphics g, int x, int y) {
+    // IMino iMino = new IMino();
+    // int[][] shape = iMino.getShape();
+
+    // for (int i = 0; i < shape.length; i++) {
+    // for (int j = 0; j < shape[i].length; j++) {
+    // if (shape[i][j] == 1) {
+    // g.setColor(iMino.getColor());
+    // g.fillRect((x + j) * blockSize, (y + i) * blockSize, blockSize, blockSize);
+
+    // }
+    // }
+    // }
+    // }
+
+    public void drowMinos(java.awt.Graphics g, int x, int y) {
+        // ここに、ブロックを描画する処理を書く
+        // spaceキーが押されたら、配列の次のブロックを描画するようにする
+        // 配列の末尾に来た場合は、最初のブロックに戻るようにする
+
+        int[][] shape = currentMino.getShape();
         for (int i = 0; i < shape.length; i++) {
             for (int j = 0; j < shape[i].length; j++) {
                 if (shape[i][j] == 1) {
-                    g.setColor(java.awt.Color.CYAN);
+                    g.setColor(currentMino.getColor());
                     g.fillRect((x + j) * blockSize, (y + i) * blockSize, blockSize, blockSize);
                 }
             }
+
         }
     }
 
+    // 衝突判定のメソッド
+    public boolean checkCollision(int nextX, int nextY) {
+        int[][] shape = currentMino.getShape();
+        for (int i = 0; i < shape.length; i++) {
+            for (int j = 0; j < shape[i].length; j++) {
+                if (shape[i][j] == 1) {
+                    int actualX = nextX + j;
+                    int actualY = nextY + i;
+                    if (actualX < 0 || actualX >= 10 || actualY >= 20) {
+                        System.out.println("衝突検知！ actualX: " + actualX + ", actualY: " + actualY);
+                        return true; // 衝突あり
+                    }
+                }
+            }
+        }
+        return false; // 衝突なし
+    }
 }
+
