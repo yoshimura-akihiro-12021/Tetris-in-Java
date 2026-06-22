@@ -45,6 +45,7 @@ public class GamePanel extends javax.swing.JPanel {
                         gridy += 1; // 下に移動
                     } else {
                         setMino(getGraphics(), gridx, gridy);
+                        deleteLine();
                         minoIndex = (minoIndex + 1) % minos.length; // 次のブロックに切り替える
                         currentMino = minos[minoIndex]; // currentMinoを更新する
                         gridx = 0; // ブロックのx座標をリセットする
@@ -80,8 +81,8 @@ public class GamePanel extends javax.swing.JPanel {
             if (!checkCollision(gridx, gridy + 1, currentMino.shape)) {
                 gridy++; // ブロックを下に移動させる
             } else {
-                deleteLine();
                 setMino(getGraphics(), gridx, gridy);
+                deleteLine();
                 minoIndex = (minoIndex + 1) % minos.length; // 次のブロックに切り替える
                 currentMino = minos[minoIndex]; // currentMinoを更新する
                 gridx = 0; // ブロックのx座標をリセットする
@@ -196,18 +197,32 @@ public class GamePanel extends javax.swing.JPanel {
     }
 
     void deleteLine() {
-
+        System.out.println("動作");
         for (int i = grid[0].length - 1; i > 1; i--) {
             boolean isContinue = false;
-            for(int j = 0;j < grid.length;j++){
-                if(grid[i][j] == 0){
+            for (int j = 0; j < grid.length; j++) {
+                if (grid[j][i] == 0) {
                     isContinue = true;
+                    break;
                 }
             }
-            if(isContinue){
+            if (isContinue) {
                 continue;
+            } else {
+                for (int j = 0; j < grid.length; j++) {
+                    for (int k = grid[0].length - 1; k > 1; k--) {
+                        grid[j][k] = grid[j][k - 1];
+                    }
+                }
+                for (int k = grid[0].length - 1; k > 1; k--) {
+                    grid[0][k] = 0;
+                }
+
+                i = grid[0].length - 1;
+                System.out.println("zikkou");
             }
             System.out.println("zikkou");
+
         }
 
     }
