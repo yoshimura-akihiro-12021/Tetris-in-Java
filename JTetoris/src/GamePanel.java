@@ -9,6 +9,8 @@ public class GamePanel extends javax.swing.JPanel {
     final int blockSize = 30; // ブロックのサイズ
     protected boolean spacePressed;
 
+    int[][] grid = new int[10][20];
+
     Tetromino[] minos = { new Imino(),
             new Omino(), new Smino(), new Zmino(), new Jmino(), new Lmino()
     };
@@ -31,25 +33,31 @@ public class GamePanel extends javax.swing.JPanel {
             public void keyPressed(java.awt.event.KeyEvent e) {
                 int keyCode = e.getKeyCode();
                 if (keyCode == java.awt.event.KeyEvent.VK_LEFT) {
-                    if (!checkCollision(gridx - 1, gridy)) {
+                    if (!checkCollision(gridx - 1, gridy, currentMino.shape)) {
                         gridx -= 1; // 左に移動
                     }
                 } else if (keyCode == java.awt.event.KeyEvent.VK_RIGHT) {
-                    if (!checkCollision(gridx + 1, gridy)) {
+                    if (!checkCollision(gridx + 1, gridy, currentMino.shape)) {
                         gridx += 1; // 右に移動
                     }
                 } else if (keyCode == java.awt.event.KeyEvent.VK_DOWN) {
-                    if (!checkCollision(gridx, gridy + 1)) {
+                    if (!checkCollision(gridx, gridy + 1, currentMino.shape)) {
                         gridy += 1; // 下に移動
+                    } else {
+                        setMino(getGraphics(), gridx, gridy);
+                        minoIndex = (minoIndex + 1) % minos.length; // 次のブロックに切り替える
+                        currentMino = minos[minoIndex]; // currentMinoを更新する
+                        gridx = 0; // ブロックのx座標をリセットする
+                        gridy = 0; // ブロックのy座標をリセットする
+                        repaint(); // 画面を再描画する
                     }
                 } else if (keyCode == java.awt.event.KeyEvent.VK_SPACE) {
                     // spaceキーが押されたときの処理
-                    spacePressed = true;
-                    minoIndex = (minoIndex + 1) % minos.length; // 次のブロックに切り替える
-                    currentMino = minos[minoIndex]; // currentMinoを更新する
-                    gridx = 0; // ブロックのx座標をリセットする
-                    gridy = 0; // ブロックのy座標をリセットする
-                    repaint(); // 画面を再描画する
+                    if (!checkCollision(gridx, gridy, currentMino.getRotatedShape())) {
+                        currentMino.rotate();
+                        repaint(); // 画面を再描画する
+                    }
+
                 }
                 repaint(); // 画面を再描画する
             }
@@ -69,8 +77,16 @@ public class GamePanel extends javax.swing.JPanel {
         javax.swing.Timer timer = new javax.swing.Timer(1000, e -> {
             // ここにループさせたい処理を書く
             // 今は1000ミリ秒ごとに画面を再描画するようにしている
-            if (!checkCollision(gridx, gridy + 1)) {
+            if (!checkCollision(gridx, gridy + 1, currentMino.shape)) {
                 gridy++; // ブロックを下に移動させる
+            } else {
+                deleteLine();
+                setMino(getGraphics(), gridx, gridy);
+                minoIndex = (minoIndex + 1) % minos.length; // 次のブロックに切り替える
+                currentMino = minos[minoIndex]; // currentMinoを更新する
+                gridx = 0; // ブロックのx座標をリセットする
+                gridy = 0; // ブロックのy座標をリセットする
+                repaint(); // 画面を再描画する
             }
             System.out.println("x:" + (gridx * blockSize) + " y:" + (gridy * blockSize));
             System.out.println(" w:" + getWidth() + " h:" + getHeight());
@@ -80,6 +96,7 @@ public class GamePanel extends javax.swing.JPanel {
             System.out.println(spacePressed);
             repaint(); // 画面を再描画する
         });
+
         timer.start();
     }
 
@@ -94,6 +111,21 @@ public class GamePanel extends javax.swing.JPanel {
                 g.drawRect(i * blockSize, j * blockSize, blockSize, blockSize); // グリッドを描画する
             }
         }
+        for (int i = 0; i < 10; i++) {
+            for (int j = 0; j < 20; j++) {
+                if (grid[i][j] == 1) {
+                    g.setColor(currentMino.getColor());
+                    g.fillRect((i) * blockSize, (j) * blockSize, blockSize, blockSize);
+                }
+            }
+        }
+        for (int i = 0; i < 20; i++) {
+            for (int j = 0; j < 10; j++) {
+                System.out.print(grid[j][i] + ",");
+            }
+            System.out.println();
+        }
+
         drowMinos(g, gridx, gridy); // ブロックを描画する
     }
 
@@ -121,9 +153,6 @@ public class GamePanel extends javax.swing.JPanel {
 
     public void drowMinos(java.awt.Graphics g, int x, int y) {
         // ここに、ブロックを描画する処理を書く
-        // spaceキーが押されたら、配列の次のブロックを描画するようにする
-        // 配列の末尾に来た場合は、最初のブロックに戻るようにする
-
         int[][] shape = currentMino.getShape();
         for (int i = 0; i < shape.length; i++) {
             for (int j = 0; j < shape[i].length; j++) {
@@ -131,20 +160,20 @@ public class GamePanel extends javax.swing.JPanel {
                     g.setColor(currentMino.getColor());
                     g.fillRect((x + j) * blockSize, (y + i) * blockSize, blockSize, blockSize);
                 }
-            }
 
+            }
         }
     }
 
     // 衝突判定のメソッド
-    public boolean checkCollision(int nextX, int nextY) {
-        int[][] shape = currentMino.getShape();
-        for (int i = 0; i < shape.length; i++) {
-            for (int j = 0; j < shape[i].length; j++) {
-                if (shape[i][j] == 1) {
+    public boolean checkCollision(int nextX, int nextY, int[][] checkShape) {
+
+        for (int i = 0; i < checkShape.length; i++) {
+            for (int j = 0; j < checkShape[i].length; j++) {
+                if (checkShape[i][j] == 1) {
                     int actualX = nextX + j;
                     int actualY = nextY + i;
-                    if (actualX < 0 || actualX >= 10 || actualY >= 20) {
+                    if (actualX < 0 || actualX >= 10 || actualY >= 20 || grid[actualX][actualY] != 0) {
                         System.out.println("衝突検知！ actualX: " + actualX + ", actualY: " + actualY);
                         return true; // 衝突あり
                     }
@@ -153,5 +182,33 @@ public class GamePanel extends javax.swing.JPanel {
         }
         return false; // 衝突なし
     }
-}
 
+    // ミノを固定(設置する)メソッド
+    void setMino(java.awt.Graphics g, int gridX, int gridY) {
+        int[][] shape = currentMino.getShape();
+        for (int i = 0; i < shape.length; i++) {
+            for (int j = 0; j < shape[i].length; j++) {
+                if (shape[i][j] == 1) {
+                    grid[gridX + j][gridY + i] = 1;
+                }
+            }
+        }
+    }
+
+    void deleteLine() {
+
+        for (int i = grid[0].length - 1; i > 1; i--) {
+            boolean isContinue = false;
+            for(int j = 0;j < grid.length;j++){
+                if(grid[i][j] == 0){
+                    isContinue = true;
+                }
+            }
+            if(isContinue){
+                continue;
+            }
+            System.out.println("zikkou");
+        }
+
+    }
+}

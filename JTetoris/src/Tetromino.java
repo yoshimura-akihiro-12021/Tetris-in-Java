@@ -13,13 +13,54 @@ public abstract class Tetromino {
     // 0 0 0 0
     protected int[][] shape = new int[4][4];
 
+    private int[][] rotatedShape = new int[4][4];
+
     private java.awt.Color color; // ブロックの色を定義するための変数
 
     // ブロックの形状を取得するための抽象メソッド
     // ブロックの形状を回転させるためのメソッド
     // このメソッドは、二次元配列を90度回転させることで、ブロックの形状を回転させる
     // このメソッドは、getShape()メソッドと異なり、共通する処理のため実装しておく
-    // 後で書く
+
+    public int[][] getRotatedShape(){
+        rotatedShape = new int[4][4];
+        for(int i = 0;i < shape.length;i++){
+            for(int j = 0;j < shape[i].length;j++){
+                rotatedShape[j][3 - i] = shape[i][j];
+                System.out.print(rotatedShape[i][j] + ", ");
+            }
+        }
+
+        for(int i = 0;i < shape.length;i++){
+            for(int j = 0;j < shape[i].length;j++){
+                System.out.print(rotatedShape[i][j] + ", ");
+            }
+
+            System.out.println();
+        }
+
+        return rotatedShape;
+    }
+    
+    public void rotate(){
+
+        for(int i = 0;i < shape.length;i++){
+            for(int j = 0;j < shape[i].length;j++){
+                rotatedShape[j][3 - i] = shape[i][j];
+                System.out.print(rotatedShape[i][j] + ", ");
+            }
+        }
+
+        for(int i = 0;i < shape.length;i++){
+            for(int j = 0;j < shape[i].length;j++){
+                System.out.print(rotatedShape[i][j] + ", ");
+            }
+
+            System.out.println();
+        }
+
+        shape = rotatedShape;
+    }
 
     // shapeのゲッター
     public int[][] getShape() {
