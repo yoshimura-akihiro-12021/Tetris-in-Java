@@ -198,7 +198,8 @@ public class GamePanel extends javax.swing.JPanel {
 
     void deleteLine() {
         System.out.println("動作");
-        for (int i = grid[0].length - 1; i > 1; i--) {
+        int i = grid[0].length - 1;
+        while (i > 1) {
             boolean isContinue = false;
             for (int j = 0; j < grid.length; j++) {
                 if (grid[j][i] == 0) {
@@ -207,6 +208,7 @@ public class GamePanel extends javax.swing.JPanel {
                 }
             }
             if (isContinue) {
+                i--;
                 continue;
             } else {
                 for (int j = 0; j < grid.length; j++) {
@@ -214,8 +216,8 @@ public class GamePanel extends javax.swing.JPanel {
                         grid[j][k] = grid[j][k - 1];
                     }
                 }
-                for (int k = grid[0].length - 1; k > 1; k--) {
-                    grid[0][k] = 0;
+                for (int k = 0; k < grid.length; k++) {
+                    grid[k][0] = 0;
                 }
 
                 i = grid[0].length - 1;
