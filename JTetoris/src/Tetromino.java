@@ -13,54 +13,38 @@ public abstract class Tetromino {
     // 0 0 0 0
     protected int[][] shape = new int[4][4];
 
-    private int[][] rotatedShape = new int[4][4];
+    public int colorId;
 
     private java.awt.Color color; // ブロックの色を定義するための変数
+
+    public int currentRotation = 0; // 回転後の現在の向きを保存
 
     // ブロックの形状を取得するための抽象メソッド
     // ブロックの形状を回転させるためのメソッド
     // このメソッドは、二次元配列を90度回転させることで、ブロックの形状を回転させる
     // このメソッドは、getShape()メソッドと異なり、共通する処理のため実装しておく
 
-    public int[][] getRotatedShape(){
-        rotatedShape = new int[4][4];
-        for(int i = 0;i < shape.length;i++){
-            for(int j = 0;j < shape[i].length;j++){
-                rotatedShape[j][3 - i] = shape[i][j];
-                System.out.print(rotatedShape[i][j] + ", ");
+    public int[][] getRotatedShape() {
+        int[][] tempRotated = new int[shape.length][shape[0].length];
+
+        for (int i = 0; i < shape.length; i++) {
+            for (int j = 0; j < shape[i].length; j++) {
+                tempRotated[j][tempRotated[0].length - 1 - i] = shape[i][j];
             }
         }
-
-        for(int i = 0;i < shape.length;i++){
-            for(int j = 0;j < shape[i].length;j++){
-                System.out.print(rotatedShape[i][j] + ", ");
-            }
-
-            System.out.println();
-        }
-
-        return rotatedShape;
+        return tempRotated;
     }
-    
-    public void rotate(){
 
-        for(int i = 0;i < shape.length;i++){
-            for(int j = 0;j < shape[i].length;j++){
-                rotatedShape[j][3 - i] = shape[i][j];
-                System.out.print(rotatedShape[i][j] + ", ");
-            }
-        }
+    public void rotate() {
 
-        for(int i = 0;i < shape.length;i++){
-            for(int j = 0;j < shape[i].length;j++){
-                System.out.print(rotatedShape[i][j] + ", ");
-            }
+        currentRotation = (currentRotation + 1) % 4;
 
-            System.out.println();
-        }
-
-        shape = rotatedShape;
+        shape = getRotatedShape();
     }
+
+    abstract public void resetRotate();
+
+    abstract public void initShape();
 
     // shapeのゲッター
     public int[][] getShape() {
@@ -84,153 +68,186 @@ public abstract class Tetromino {
 class Imino extends Tetromino {
 
     public Imino() {
+        initShape();
+    }
+
+    @Override
+    public void initShape() {
+
+        shape = new int[4][4];
+
         // I型のブロックの形状を定義する
         shape[1][0] = 1;
         shape[1][1] = 1;
         shape[1][2] = 1;
         shape[1][3] = 1;
         setColor(java.awt.Color.CYAN); // ブロックの色を設定する
+        colorId = 1;
 
         // 0 0 0 0
         // 1 1 1 1
         // 0 0 0 0
         // 0 0 0 0
+
     }
 
-    
+    @Override
+    public void resetRotate() {
+        initShape();
+        currentRotation = 0;
+    }
+
 }
 
 class Omino extends Tetromino {
 
     public Omino() {
+
+        initShape();
+
+    }
+
+    @Override
+    public void initShape() {
+
+        shape = new int[4][4];
+
         // O型のブロックの形状を定義する
         shape[1][1] = 1;
         shape[1][2] = 1;
         shape[2][1] = 1;
         shape[2][2] = 1;
         setColor(java.awt.Color.YELLOW); // ブロックの色を設定する
+        colorId = 2;
+        // 0 0 0 0
+        // 0 1 1 0
+        // 0 1 1 0
+        // 0 0 0 0
 
-        // 0 0 0 0
-        // 0 1 1 0
-        // 0 1 1 0
-        // 0 0 0 0
     }
 
-}
+    @Override
+    public void resetRotate() {
 
-class LongTmino extends Tetromino {
+        initShape();
+        currentRotation = 0;
 
-    public LongTmino() {
-        // 長いT型のブロックの形状を定義する
-        shape[1][0] = 1;
-        shape[1][1] = 1;
-        shape[1][2] = 1;
-        shape[2][1] = 1;
-        shape[3][1] = 1;
-        Color BLUE = new Color(0, 0, 255); // 青色のRGB値
-        setColor(BLUE); // ブロックの色を設定する
-        // 0 0 0 0
-        // 1 1 1 0
-        // 0 1 0 0
-        // 0 1 0 0
-    }
-
-}
-
-class Zmino extends Tetromino {
-
-    public Zmino() {
-        // Z型のブロックの形状を定義する
-        shape[1][0] = 1;
-        shape[1][1] = 1;
-        shape[2][1] = 1;
-        shape[2][2] = 1;
-        Color RED = new Color(255, 0, 0); // 赤色のRGB値
-        setColor(RED); // ブロックの色を設定する
-
-        // 0 0 0 0
-        // 1 1 0 0
-        // 0 1 1 0
-        // 0 0 0 0
     }
 
 }
 
 class Smino extends Tetromino {
-
     public Smino() {
-        // S型のブロックの形状を定義する
-        shape[1][1] = 1;
-        shape[1][2] = 1;
-        shape[2][0] = 1;
-        shape[2][1] = 1;
-        Color GREEN = new Color(0, 255, 0); // 緑色のRGB値
-        setColor(GREEN); // ブロックの色を設定する
-
-        // 0 0 0 0
-        // 0 1 1 0
-        // 1 1 0 0
-        // 0 0 0 0
+        initShape();
     }
 
-}
-
-class Jmino extends Tetromino {
-
-    public Jmino() {
-        // J型のブロックの形状を定義する
+    @Override
+    public void initShape() {
+        shape = new int[3][3]; // 3x3にする
+        shape[0][1] = 1;
+        shape[0][2] = 1;
         shape[1][0] = 1;
         shape[1][1] = 1;
-        shape[1][2] = 1;
-        shape[2][0] = 1;
-        Color ORANGE = new Color(255, 165, 0); // オレンジ色のRGB値
-        setColor(ORANGE); // ブロックの色を設定する
-
-        // 0 0 0 0
-        // 1 1 1 0
-        // 1 0 0 0
-        // 0 0 0 0
+        shape[2][0] = 0; // 3列目は空
+        setColor(java.awt.Color.GREEN);
+        colorId = 5;
     }
 
+    @Override
+    public void resetRotate() {
+        initShape();
+        currentRotation = 0;
+    }
 }
 
-class Lmino extends Tetromino {
-
-    public Lmino() {
-        // L型のブロックの形状を定義する
-        shape[1][0] = 1;
-        shape[1][1] = 1;
-        shape[1][2] = 1;
-        shape[2][2] = 1;
-        Color ORANGE = new Color(255, 165, 0); // オレンジ色のRGB値
-        setColor(ORANGE); // ブロックの色を設定する
-
-        // 0 0 0 0
-        // 1 1 1 0
-        // 0 0 1 0
-        // 0 0 0 0
+class Zmino extends Tetromino {
+    public Zmino() {
+        initShape();
     }
 
+    @Override
+    public void initShape() {
+        shape = new int[3][3];
+        shape[0][0] = 1;
+        shape[0][1] = 1;
+        shape[1][1] = 1;
+        shape[1][2] = 1;
+        setColor(java.awt.Color.RED);
+        colorId = 4;
+    }
+
+    @Override
+    public void resetRotate() {
+        initShape();
+        currentRotation = 0;
+    }
 }
 
 class TMino extends Tetromino {
-
     public TMino() {
-        // T型のブロックの形状を定義する
+        initShape();
+    }
+
+    @Override
+    public void initShape() {
+        shape = new int[3][3];
+        shape[0][1] = 1;
         shape[1][0] = 1;
         shape[1][1] = 1;
         shape[1][2] = 1;
-        shape[2][1] = 1;
-        Color PURPLE = new Color(128, 0, 128); // 紫色のRGB値
-        setColor(PURPLE); // ブロックの色を設定する
-
-        // 0 0 0 0
-        // 1 1 1 0
-        // 0 1 0 0
-        // 0 0 0 0
+        setColor(new Color(128, 0, 128));
+        colorId = 8;
     }
 
+    @Override
+    public void resetRotate() {
+        initShape();
+        currentRotation = 0;
+    }
 }
 
+class Jmino extends Tetromino {
+    public Jmino() {
+        initShape();
+    }
 
+    @Override
+    public void initShape() {
+        shape = new int[3][3];
+        shape[0][0] = 1;
+        shape[1][0] = 1;
+        shape[1][1] = 1;
+        shape[1][2] = 1;
+        setColor(java.awt.Color.ORANGE);
+        colorId = 6;
+    }
 
+    @Override
+    public void resetRotate() {
+        initShape();
+        currentRotation = 0;
+    }
+}
+
+class Lmino extends Tetromino {
+    public Lmino() {
+        initShape();
+    }
+
+    @Override
+    public void initShape() {
+        shape = new int[3][3];
+        shape[0][2] = 1;
+        shape[1][0] = 1;
+        shape[1][1] = 1;
+        shape[1][2] = 1;
+        setColor(java.awt.Color.ORANGE);
+        colorId = 7;
+    }
+
+    @Override
+    public void resetRotate() {
+        initShape();
+        currentRotation = 0;
+    }
+}

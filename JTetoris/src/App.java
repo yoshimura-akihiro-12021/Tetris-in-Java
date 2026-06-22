@@ -8,7 +8,7 @@ public class App {
         // JFrameを用いてウィンドウを作成
         JFrame frame = new JFrame("JTetoris");
         GamePanel gamePanel = new GamePanel();
-        gamePanel.setPreferredSize(new java.awt.Dimension(gamePanel.blockSize * 10, gamePanel.blockSize * 20));
+        // gamePanel.setPreferredSize(new java.awt.Dimension(gamePanel.blockSize * 10, gamePanel.blockSize * 20));
         frame.add(gamePanel);
         frame.pack();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
